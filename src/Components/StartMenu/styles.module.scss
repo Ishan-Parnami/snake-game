@@ -1,0 +1,71 @@
+$primary-blue: #2196F3;
+$hover-blue: #1976D2;
+$disabled-gray: #607D8B;
+$easy-green: #4CAF50;
+$medium-yellow: #FFC107;
+$hard-red: #F44336;
+$white: #ffffff;
+
+.startMenu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  
+    .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+  
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+  
+      .button {
+        padding: 0.5rem 1rem;
+        color: white;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+  
+        &:hover {
+          filter: brightness(90%);
+        }
+  
+        &.easy {
+          background-color: #4CAF50;
+        }
+  
+        &.medium {
+          background-color: #FFC107;
+        }
+  
+        &.hard {
+          background-color: #F44336;
+        }
+      }
+    }
+  
+    .startButton {
+      padding: 0.5rem 1.5rem;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+  
+      &:hover:not(:disabled) {
+        background-color: #1976D2;
+      }
+  
+      &:disabled {
+        background-color: #607D8B;
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+    }
+  }
