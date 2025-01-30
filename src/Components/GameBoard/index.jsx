@@ -14,7 +14,7 @@ const GameBoard = ({ difficulty, onGameOver }) => {
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   
-  const gameSpeed = difficulty === "easy" ? 150 : difficulty === "medium" ? 100 : 50;
+  const gameSpeed = difficulty === "easy" ? 100 : difficulty === "medium" ? 75 : 50;
 
   const generateFood = useCallback(() => {
     const newFood = {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import StartMenu from "./Components/StartMenu/index";
 import GameBoard from "./Components/GameBoard/index";
+import "./App.css";
 
 const App = () => {
   const [gameStarted, setGameStarted] = useState(false);
