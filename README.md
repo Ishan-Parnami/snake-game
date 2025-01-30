@@ -1,4 +1,3 @@
-```md
 # React Snake Game 🐍  
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://react.dev/)  
