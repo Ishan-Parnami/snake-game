@@ -1,8 +1,19 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 
 const StartMenu = ({ onStart }) => {
   const [difficulty, setDifficulty] = useState("");
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter" && difficulty) {
+        onStart(difficulty);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [difficulty, onStart]);
 
   return (
     <div className={styles.startMenu}>
@@ -36,6 +47,10 @@ const StartMenu = ({ onStart }) => {
       </button>
     </div>
   );
+};
+
+StartMenu.propTypes = {
+  onStart: PropTypes.func.isRequired,
 };
 
 export default StartMenu;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import StartMenu from "./Components/StartMenu/index";
 import GameBoard from "./Components/GameBoard/index";
 import "./App.css";
@@ -8,7 +8,7 @@ const App = () => {
   const [difficulty, setDifficulty] = useState("");
 
   return (
-    <div className="h-screen flex justify-center items-center bg-gray-900 text-white">
+    <div className="app-container">
       {!gameStarted ? (
         <StartMenu onStart={(diff) => { setDifficulty(diff); setGameStarted(true); }} />
       ) : (
