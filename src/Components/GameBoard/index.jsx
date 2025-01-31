@@ -2,13 +2,18 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 
-const gridSize = 20;
-const canvasWidth = 500;
-const canvasHeight = 500;
-const tileCountX = canvasWidth / gridSize;
-const tileCountY = canvasHeight / gridSize;
+// Base dimensions for scaling
+const baseGridSize = 20;
+const baseCanvasSize = 500;
 
 const GameBoard = ({ difficulty, onGameOver }) => {
+  // Responsive state
+  const [canvasSize, setCanvasSize] = useState(baseCanvasSize);
+  const [gridSize, setGridSize] = useState(baseGridSize);
+  const [tileCountX, setTileCountX] = useState(Math.floor(baseCanvasSize / baseGridSize));
+  const [tileCountY, setTileCountY] = useState(Math.floor(baseCanvasSize / baseGridSize));
+
+  // Game state
   const [snake, setSnake] = useState([{ x: 10, y: 10 }]);
   const [food, setFood] = useState({ x: 15, y: 15 });
   const [direction, setDirection] = useState("right");
@@ -18,21 +23,51 @@ const GameBoard = ({ difficulty, onGameOver }) => {
   const directionRef = useRef(direction);
   const [lastMoveTime, setLastMoveTime] = useState(Date.now());
 
+  // Responsive calculations
+  useEffect(() => {
+    const calculateDimensions = () => {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      
+      // Calculate maximum canvas size
+      const maxSize = Math.min(screenWidth * 0.9, screenHeight * 0.7, baseCanvasSize);
+      const scaleFactor = maxSize / baseCanvasSize;
+      
+      // Calculate proportional grid size (minimum 10px)
+      const newGridSize = Math.max(Math.floor(baseGridSize * scaleFactor), 10);
+      
+      // Adjust canvas size to fit exact grid cells
+      const exactTileCount = Math.floor(maxSize / newGridSize);
+      const adjustedCanvasSize = exactTileCount * newGridSize;
+      
+      setCanvasSize(adjustedCanvasSize);
+      setGridSize(newGridSize);
+      setTileCountX(exactTileCount);
+      setTileCountY(exactTileCount);
+    };
+
+    calculateDimensions();
+    window.addEventListener('resize', calculateDimensions);
+    return () => window.removeEventListener('resize', calculateDimensions);
+  }, []);
+
+  // Game speed calculation
   const gameSpeed = difficulty === "easy" ? 175 : difficulty === "medium" ? 150 : 125;
 
+  // Food generation
   const generateFood = useCallback(() => {
     const newFood = {
       x: Math.floor(Math.random() * tileCountX),
       y: Math.floor(Math.random() * tileCountY)
     };
 
-    // Ensure food doesn't spawn on snake
     if (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y)) {
       return generateFood();
     }
     return newFood;
-  }, [snake]);
+  }, [snake, tileCountX, tileCountY]);
 
+  // Game over handling
   const handleGameOver = useCallback(() => {
     setGameOver(true);
   }, []);
@@ -44,11 +79,11 @@ const GameBoard = ({ difficulty, onGameOver }) => {
     }
   }, [gameOver, score, onGameOver]);
 
+  // Snake movement logic
   const moveSnake = useCallback(() => {
     setSnake((prevSnake) => {
       const head = { ...prevSnake[0] };
 
-      // Update head position
       switch (direction) {
         case "up": head.y--; break;
         case "down": head.y++; break;
@@ -56,13 +91,12 @@ const GameBoard = ({ difficulty, onGameOver }) => {
         case "right": head.x++; break;
       }
 
-      // Wall collision check
+      // Collision checks
       if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
         handleGameOver();
         return prevSnake;
       }
 
-      // Self collision check
       if (prevSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
         handleGameOver();
         return prevSnake;
@@ -70,7 +104,7 @@ const GameBoard = ({ difficulty, onGameOver }) => {
 
       const newSnake = [head, ...prevSnake];
 
-      // Food consumption check
+      // Food consumption
       if (head.x === food.x && head.y === food.y) {
         setScore((s) => s + 1);
         setFood(generateFood());
@@ -80,27 +114,36 @@ const GameBoard = ({ difficulty, onGameOver }) => {
 
       return newSnake;
     });
-  }, [direction, food.x, food.y, generateFood, handleGameOver]);
+  }, [direction, food.x, food.y, generateFood, handleGameOver, tileCountX, tileCountY]);
 
+  // Drawing logic
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-
-    // Clear canvas
+    
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, canvasSize, canvasSize);
 
-    // Draw snake
     snake.forEach((segment, index) => {
       ctx.fillStyle = index === 0 ? "#45a049" : "#4caf50";
-      ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+      ctx.fillRect(
+        segment.x * gridSize,
+        segment.y * gridSize,
+        gridSize - 2,
+        gridSize - 2
+      );
     });
 
-    // Draw food
     ctx.fillStyle = "#ff0000";
-    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-  }, [snake, food]);
+    ctx.fillRect(
+      food.x * gridSize,
+      food.y * gridSize,
+      gridSize - 2,
+      gridSize - 2
+    );
+  }, [snake, food, gridSize, canvasSize]);
 
+  // Keyboard controls
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === " ") {
@@ -120,20 +163,11 @@ const GameBoard = ({ difficulty, onGameOver }) => {
 
       let newDir = currentDir;
       switch (e.key) {
-        case "ArrowUp":
-          if (currentDir !== "down") newDir = "up";
-          break;
-        case "ArrowDown":
-          if (currentDir !== "up") newDir = "down";
-          break;
-        case "ArrowLeft":
-          if (currentDir !== "right") newDir = "left";
-          break;
-        case "ArrowRight":
-          if (currentDir !== "left") newDir = "right";
-          break;
-        default:
-          return;
+        case "ArrowUp": if (currentDir !== "down") newDir = "up"; break;
+        case "ArrowDown": if (currentDir !== "up") newDir = "down"; break;
+        case "ArrowLeft": if (currentDir !== "right") newDir = "left"; break;
+        case "ArrowRight": if (currentDir !== "left") newDir = "right"; break;
+        default: return;
       }
 
       if (newDir !== currentDir) {
@@ -147,10 +181,12 @@ const GameBoard = ({ difficulty, onGameOver }) => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [isPaused, lastMoveTime, gameSpeed]);
 
+  // Sync direction ref
   useEffect(() => {
     directionRef.current = direction;
   }, [direction]);
 
+  // Game loop
   useEffect(() => {
     if (!isPaused && !gameOver) {
       const interval = setInterval(moveSnake, gameSpeed);
@@ -162,8 +198,13 @@ const GameBoard = ({ difficulty, onGameOver }) => {
     <div className={styles.gameContainer}>
       <div className={styles.score}>Score: {score}</div>
       <div className={styles.canvasContainer}>
-        <canvas id="gameCanvas" width={canvasWidth} height={canvasHeight}></canvas>
+        <canvas 
+          id="gameCanvas" 
+          width={canvasSize} 
+          height={canvasSize}
+        ></canvas>
       </div>
+      
       <button className={styles.startBtn} onClick={() => setIsPaused(!isPaused)}>
         {isPaused ? "Play" : "Pause"}
       </button>
@@ -176,6 +217,7 @@ const GameBoard = ({ difficulty, onGameOver }) => {
         </div>
         <button className={styles.controlButton} onClick={() => setDirection("down")}>▼</button>
       </div>
+      
       <button
         className={styles.mobilePauseButton}
         onClick={() => setIsPaused(!isPaused)}
