@@ -30,7 +30,13 @@ $white: #ffffff;
         border-radius: 0.25rem;
         cursor: pointer;
         transition: background-color 0.2s ease;
-  
+
+        &:disabled {
+          background-color: #607D8B; // Gray color
+          cursor: not-allowed;
+          opacity: 0.7;
+        }
+
         &:hover {
           filter: brightness(90%);
         }
@@ -66,6 +72,51 @@ $white: #ffffff;
         background-color: #607D8B;
         cursor: not-allowed;
         opacity: 0.7;
+      }
+      &.default {
+        background-color: #2196F3; // Default color (blue)
+      }
+    
+      &.easy {
+        background-color: #4CAF50; // Green for Easy
+      }
+    
+      &.medium {
+        background-color: #FFC107; // Yellow for Medium
+      }
+    
+      &.hard {
+        background-color: #F44336; // Red for Hard
+      }
+    }
+  }
+
+  .levelButtons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  
+    button {
+      padding: 0.5rem 1rem;
+      color: white;
+      border: none;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+      background-color: #a940bb;
+      font-size: 1rem;
+      font-weight: 500;
+  
+      &:hover {
+        transform: scale(1.05);
+      }
+  
+      &:active {
+        transform: scale(.95);
+        background-color: #731983;
+      }
+      &.selected {
+        background-color: #731983;
       }
     }
   }

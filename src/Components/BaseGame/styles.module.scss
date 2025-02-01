@@ -5,6 +5,21 @@ $border-color: #4caf50;
 $button-bg: #4caf50;
 $button-hover: #3e8e41;
 
+.scoreContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  // gap: 50px;
+  margin-bottom: 30px;
+}
+
+.highScore {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+//_______________________________________________________//
+
 .gameContainer {
   display: flex;
   flex-direction: column;
@@ -14,29 +29,21 @@ $button-hover: #3e8e41;
   font-family: Arial, sans-serif;
 }
 
-.score {
-  color: #fff;
-  font-size: 24px;
-  margin-bottom: 20px;
-}
-
 .canvasContainer {
   position: relative;
   canvas {
-    border: 2px solid $border-color;
+    // border: 2px solid $border-color;
     background-color: #000;
   }
 }
 
 .startBtn {
-  display: block;
-  margin-top: 20px;
+  align-self: self-end;
+  margin-top: 40px;
   padding: 10px 20px;
   font-size: 18px;
   cursor: pointer;
   background-color: $button-bg;
-  color: white;
-  border: none;
   border-radius: 5px;
   transition: background 0.3s ease-in-out;
 
@@ -48,17 +55,17 @@ $button-hover: #3e8e41;
 // -------------------------------------------- //
 
 .mobileControls {
-  display: none; /* Hide by default */
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: 5px;
   margin-top: 10px;
-
+  
   .horizontalControls {
     display: flex;
-    gap: 40px;
+    gap: 100px;
   }
-
+  
   .controlButton {
     background-color: #4caf50;
     color: white;
@@ -69,7 +76,7 @@ $button-hover: #3e8e41;
     font-size: 20px;
     cursor: pointer;
     transition: background-color 0.3s;
-
+    
     &:hover {
       background-color: #45a049;
     }
@@ -77,8 +84,9 @@ $button-hover: #3e8e41;
 }
 
 .mobilePauseButton {
-  display: none; 
-  margin-top: 20px;
+  display: none;
+  align-self: self-end;
+  margin-top: 30px;
   padding: 10px 20px;
   background-color: #2196f3;
   color: white;
@@ -86,7 +94,7 @@ $button-hover: #3e8e41;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-
+  
   &:hover {
     background-color: #1976d2;
   }
@@ -96,11 +104,34 @@ $button-hover: #3e8e41;
   .mobileControls {
     display: flex;
   }
-
+  
   .mobilePauseButton {
     display: block;
   }
   .startBtn {
     display: none;
+  }
+}
+
+// -------------------------------------------- //
+
+@media (max-width: 333px) {
+  .mobileControls {
+    .horizontalControls {
+      gap: 50px;
+    }
+    .controlButton {
+      width: 30px;
+      height: 30px;
+      font-size: 12px;
+    }
+  }
+  .mobilePauseButton {
+    margin-top: 30px;
+    padding: 5px 10px;
+    font-size: 14px;
+  }
+  .scoreContainer{
+    font-size: x-small;
   }
 }

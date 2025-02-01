@@ -2,11 +2,17 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 
-// Base dimensions for scaling
-const baseGridSize = 20;
-const baseCanvasSize = 500;
+const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision = false }) => {
+  // Base dimensions for scaling
+  const baseGridSize = 20;
+  const baseCanvasSize = 500;
 
-const GameBoard = ({ difficulty, onGameOver }) => {
+  const [borderStyle, setBorderStyle] = useState("none");
+
+  useEffect(() => {
+    setBorderStyle(wallCollision ? "2px solid #4CAF50" : "none");
+  }, [wallCollision]);
+
   // Responsive state
   const [canvasSize, setCanvasSize] = useState(baseCanvasSize);
   const [gridSize, setGridSize] = useState(baseGridSize);
@@ -20,26 +26,28 @@ const GameBoard = ({ difficulty, onGameOver }) => {
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [highScore, setHighScore] = useState(0);
   const directionRef = useRef(direction);
+  const gameOverRef = useRef(false);
   const [lastMoveTime, setLastMoveTime] = useState(Date.now());
 
-  // Responsive calculations
+  // Responsive dimensions calculation
   useEffect(() => {
     const calculateDimensions = () => {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-      
+
       // Calculate maximum canvas size
       const maxSize = Math.min(screenWidth * 0.9, screenHeight * 0.7, baseCanvasSize);
       const scaleFactor = maxSize / baseCanvasSize;
-      
-      // Calculate proportional grid size (minimum 10px)
+
+      // Calculate proportional grid size (minimum 10px)      
       const newGridSize = Math.max(Math.floor(baseGridSize * scaleFactor), 10);
-      
-      // Adjust canvas size to fit exact grid cells
+
+      // Adjust canvas size to fit exact grid cells      
       const exactTileCount = Math.floor(maxSize / newGridSize);
       const adjustedCanvasSize = exactTileCount * newGridSize;
-      
+
       setCanvasSize(adjustedCanvasSize);
       setGridSize(newGridSize);
       setTileCountX(exactTileCount);
@@ -54,6 +62,19 @@ const GameBoard = ({ difficulty, onGameOver }) => {
   // Game speed calculation
   const gameSpeed = difficulty === "easy" ? 175 : difficulty === "medium" ? 150 : 125;
 
+  // High score handling
+  useEffect(() => {
+    const savedScore = localStorage.getItem(`snakeHighScore_level${level}_${difficulty}`);
+    setHighScore(savedScore ? parseInt(savedScore) : 0);
+  }, [level, difficulty]);
+
+  const saveHighScore = useCallback((newScore) => {
+    if (newScore > highScore) {
+      localStorage.setItem(`snakeHighScore_level${level}_${difficulty}`, newScore);
+      setHighScore(newScore);
+    }
+  }, [highScore, level, difficulty]);
+
   // Food generation
   const generateFood = useCallback(() => {
     const newFood = {
@@ -61,23 +82,35 @@ const GameBoard = ({ difficulty, onGameOver }) => {
       y: Math.floor(Math.random() * tileCountY)
     };
 
-    if (snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y)) {
-      return generateFood();
+    while (
+      snake.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
+      obstacles.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y)
+    ) {
+      newFood.x = Math.floor(Math.random() * tileCountX);
+      newFood.y = Math.floor(Math.random() * tileCountY);
     }
+
     return newFood;
-  }, [snake, tileCountX, tileCountY]);
+  }, [snake, tileCountX, tileCountY, obstacles]);
 
   // Game over handling
   const handleGameOver = useCallback(() => {
-    setGameOver(true);
-  }, []);
+    if (gameOverRef.current) return;
+    gameOverRef.current = true;
 
-  useEffect(() => {
-    if (gameOver) {
-      alert(`Game Over! Score: ${score}`);
-      onGameOver();
+    setGameOver(true);
+    saveHighScore(score);
+
+    let message;
+    if (score > highScore) {
+      message = `New High Score! 🎉\n Your Score: ${score}\nPrevious Best: ${highScore}`;
+    } else {
+      message = `Game Over! Your Score: ${score}\nHighest Score: ${highScore}`;
     }
-  }, [gameOver, score, onGameOver]);
+
+    alert(message);
+    onGameOver();
+  }, [score, highScore, onGameOver, saveHighScore]);
 
   // Snake movement logic
   const moveSnake = useCallback(() => {
@@ -91,13 +124,30 @@ const GameBoard = ({ difficulty, onGameOver }) => {
         case "right": head.x++; break;
       }
 
-      // Collision checks
-      if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
+      // Collision detection
+      if (wallCollision) {
+        // Collision check
+        if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
+          handleGameOver();
+          return prevSnake;
+        }
+      } else {
+        // Wrap around logic
+        head.x = (head.x + tileCountX) % tileCountX;
+        head.y = (head.y + tileCountY) % tileCountY;
+      }
+
+      if (prevSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
         handleGameOver();
         return prevSnake;
       }
 
-      if (prevSnake.some((segment) => segment.x === head.x && segment.y === head.y)) {
+      //pbstacle collision check
+      const hitObstacle = obstacles.some(
+        (obstacle) => head.x === obstacle.x && head.y === obstacle.y
+      );
+
+      if (hitObstacle) {
         handleGameOver();
         return prevSnake;
       }
@@ -114,15 +164,27 @@ const GameBoard = ({ difficulty, onGameOver }) => {
 
       return newSnake;
     });
-  }, [direction, food.x, food.y, generateFood, handleGameOver, tileCountX, tileCountY]);
+  }, [direction, food.x, food.y, generateFood, wallCollision, handleGameOver, tileCountX, tileCountY, obstacles]);
 
   // Drawing logic
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    
+
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+    if (obstacles) {
+      ctx.fillStyle = "#555"; // Gray color for obstacles
+      obstacles.forEach((obstacle) => {
+        ctx.fillRect(
+          obstacle.x * gridSize + 1,
+          obstacle.y * gridSize + 1,
+          gridSize - 2,
+          gridSize - 2
+        );
+      });
+    }
 
     snake.forEach((segment, index) => {
       ctx.fillStyle = index === 0 ? "#45a049" : "#4caf50";
@@ -141,7 +203,7 @@ const GameBoard = ({ difficulty, onGameOver }) => {
       gridSize - 2,
       gridSize - 2
     );
-  }, [snake, food, gridSize, canvasSize]);
+  }, [snake, food, gridSize, canvasSize, obstacles]);
 
   // Keyboard controls
   useEffect(() => {
@@ -186,38 +248,49 @@ const GameBoard = ({ difficulty, onGameOver }) => {
     directionRef.current = direction;
   }, [direction]);
 
+  useEffect(() => {
+    gameOverRef.current = false; // Reset when the game starts
+  }, [level, difficulty]);
+
   // Game loop
   useEffect(() => {
     if (!isPaused && !gameOver) {
+      const gameSpeed = difficulty === "easy" ? 175 :
+        difficulty === "medium" ? 150 : 125;
       const interval = setInterval(moveSnake, gameSpeed);
       return () => clearInterval(interval);
     }
-  }, [isPaused, moveSnake, gameSpeed, gameOver]);
+  }, [isPaused, moveSnake, gameOver, difficulty]);
+
+  // Mobile controls handler
+  const handleMobileDirection = (newDirection) => {
+    if (isPaused) setIsPaused(false);
+    setDirection(newDirection);
+  };
 
   return (
     <div className={styles.gameContainer}>
-      <div className={styles.score}>Score: {score}</div>
-      <div className={styles.canvasContainer}>
-        <canvas 
-          id="gameCanvas" 
-          width={canvasSize} 
-          height={canvasSize}
-        ></canvas>
+      <div className={styles.scoreContainer}>
+        <div className={styles.highScore}>Highest Score: {highScore}</div>
+        <div className={styles.currentScore}>Your Score: {score}</div>
       </div>
-      
+
+      <div className={styles.canvasContainer}>
+        <canvas id="gameCanvas" width={canvasSize} height={canvasSize} style={{ border: borderStyle }}></canvas>
+      </div>
       <button className={styles.startBtn} onClick={() => setIsPaused(!isPaused)}>
         {isPaused ? "Play" : "Pause"}
       </button>
 
       <div className={styles.mobileControls}>
-        <button className={styles.controlButton} onClick={() => setDirection("up")}>▲</button>
+        <button className={styles.controlButton} onClick={() => handleMobileDirection("up")}>▲</button>
         <div className={styles.horizontalControls}>
-          <button className={styles.controlButton} onClick={() => setDirection("left")}>◀</button>
-          <button className={styles.controlButton} onClick={() => setDirection("right")}>▶</button>
+          <button className={styles.controlButton} onClick={() => handleMobileDirection("left")}>◀</button>
+          <button className={styles.controlButton} onClick={() => handleMobileDirection("right")}>▶</button>
         </div>
-        <button className={styles.controlButton} onClick={() => setDirection("down")}>▼</button>
+        <button className={styles.controlButton} onClick={() => handleMobileDirection("down")}>▼</button>
       </div>
-      
+
       <button
         className={styles.mobilePauseButton}
         onClick={() => setIsPaused(!isPaused)}
@@ -228,9 +301,17 @@ const GameBoard = ({ difficulty, onGameOver }) => {
   );
 };
 
-GameBoard.propTypes = {
+BaseGame.propTypes = {
+  level: PropTypes.number.isRequired,
   difficulty: PropTypes.string.isRequired,
   onGameOver: PropTypes.func.isRequired,
+  wallCollision: PropTypes.bool,
+  obstacles: PropTypes.arrayOf(
+    PropTypes.shape({
+      x: PropTypes.number.isRequired,
+      y: PropTypes.number.isRequired
+    })
+  )
 };
 
-export default GameBoard;
+export default BaseGame;
