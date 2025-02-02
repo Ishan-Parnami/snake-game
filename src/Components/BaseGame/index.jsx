@@ -61,7 +61,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     calculateDimensions();
     window.addEventListener('resize', calculateDimensions);
     return () => window.removeEventListener('resize', calculateDimensions);
-  }, []);
+  }, [handleMobileDirection]);
 
   // Game speed calculation
   const gameSpeed = useMemo(() => {
@@ -269,10 +269,10 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   }, [isPaused, moveSnake, gameOver, difficulty]);
 
   // Mobile controls handler
-  const handleMobileDirection = (newDirection) => {
+  const handleMobileDirection = useCallback((newDirection) => {
     if (isPaused) setIsPaused(false);
     setDirection(newDirection);
-  };
+  }, [isPaused]);
 
   useEffect(() => {
     const handleTouch = (e) => {
@@ -294,7 +294,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     };
     window.addEventListener("touchstart", handleTouch);
     return () => window.removeEventListener("touchstart", handleTouch);
-  }, []);
+  }, [handleMobileDirection]);
 
   return (
     <div className={styles.gameContainer}>
