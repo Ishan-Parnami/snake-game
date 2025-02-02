@@ -37,6 +37,10 @@ $white: #ffffff;
           opacity: 0.7;
         }
 
+        &:active {
+          transform: scale(.95);
+        }
+
         &:hover {
           filter: brightness(90%);
         }
@@ -66,6 +70,10 @@ $white: #ffffff;
   
       &:hover:not(:disabled) {
         background-color: #1976D2;
+      }
+
+      &:active {
+        transform: scale(.95);
       }
   
       &:disabled {
