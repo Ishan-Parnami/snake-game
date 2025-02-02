@@ -1,8 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 import styles from "./styles.module.scss";
 
 const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision = false }) => {
+
+  if (!difficulty || !onGameOver) {
+    throw new Error("Missing required props");
+  }
   // Base dimensions for scaling
   const baseGridSize = 20;
   const baseCanvasSize = 500;
@@ -60,7 +64,9 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   }, []);
 
   // Game speed calculation
-  const gameSpeed = difficulty === "easy" ? 175 : difficulty === "medium" ? 150 : 125;
+  const gameSpeed = useMemo(() => {
+    return difficulty === "easy" ? 175 : difficulty === "medium" ? 150 : 125;
+  }, [difficulty]);
 
   // High score handling
   useEffect(() => {
@@ -267,6 +273,28 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     if (isPaused) setIsPaused(false);
     setDirection(newDirection);
   };
+
+  useEffect(() => {
+    const handleTouch = (e) => {
+      switch (e.target.id) {
+        case "up":
+          handleMobileDirection("up");
+          break;
+        case "down":
+          handleMobileDirection("down");
+          break;
+        case "left":
+          handleMobileDirection("left");
+          break;
+        case "right":
+          handleMobileDirection("right");
+          break;
+        default: return;
+      }
+    };
+    window.addEventListener("touchstart", handleTouch);
+    return () => window.removeEventListener("touchstart", handleTouch);
+  }, []);
 
   return (
     <div className={styles.gameContainer}>

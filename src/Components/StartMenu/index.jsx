@@ -33,10 +33,11 @@ const StartMenu = ({ onStart }) => {
     <div className={styles.startMenu}>
       <h2 className={styles.title}>Select Level</h2>
       <div className={styles.levelButtons}>
-        <button className={level === 1 ? styles.selected : ""} onClick={() => setLevel(1)}>Level 1</button>
-        <button className={level === 2 ? styles.selected : ""} onClick={() => setLevel(2)}>Level 2</button>
-        <button className={level === 3 ? styles.selected : ""} onClick={() => setLevel(3)}>Level 3</button>
-        <button className={level === 4 ? styles.selected : ""} onClick={() => setLevel(4)}>Level 4</button>
+        <button className={level === 1 ? styles.selected : ""} onClick={() => setLevel(1)}>1</button>
+        <button className={level === 2 ? styles.selected : ""} onClick={() => setLevel(2)}>2</button>
+        <button className={level === 3 ? styles.selected : ""} onClick={() => setLevel(3)}>3</button>
+        <button className={level === 4 ? styles.selected : ""} onClick={() => setLevel(4)}>4</button>
+        <button className={level === 5 ? styles.selected : ""} onClick={() => setLevel(5)}>5</button>
         {/* // Add more levels */}
       </div>
 
