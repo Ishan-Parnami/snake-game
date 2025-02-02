@@ -35,6 +35,34 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   const gameOverRef = useRef(false);
   const [lastMoveTime, setLastMoveTime] = useState(Date.now());
 
+  // Mobile controls handler
+  const handleMobileDirection = useCallback((newDirection) => {
+    if (isPaused) setIsPaused(false);
+    setDirection(newDirection);
+  }, [isPaused]);
+
+  useEffect(() => {
+    const handleTouch = (e) => {
+      switch (e.target.id) {
+        case "up":
+          handleMobileDirection("up");
+          break;
+        case "down":
+          handleMobileDirection("down");
+          break;
+        case "left":
+          handleMobileDirection("left");
+          break;
+        case "right":
+          handleMobileDirection("right");
+          break;
+        default: return;
+      }
+    };
+    window.addEventListener("touchstart", handleTouch);
+    return () => window.removeEventListener("touchstart", handleTouch);
+  }, [handleMobileDirection]);
+
   // Responsive dimensions calculation
   useEffect(() => {
     const calculateDimensions = () => {
@@ -267,34 +295,6 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
       return () => clearInterval(interval);
     }
   }, [isPaused, moveSnake, gameOver, difficulty]);
-
-  // Mobile controls handler
-  const handleMobileDirection = useCallback((newDirection) => {
-    if (isPaused) setIsPaused(false);
-    setDirection(newDirection);
-  }, [isPaused]);
-
-  useEffect(() => {
-    const handleTouch = (e) => {
-      switch (e.target.id) {
-        case "up":
-          handleMobileDirection("up");
-          break;
-        case "down":
-          handleMobileDirection("down");
-          break;
-        case "left":
-          handleMobileDirection("left");
-          break;
-        case "right":
-          handleMobileDirection("right");
-          break;
-        default: return;
-      }
-    };
-    window.addEventListener("touchstart", handleTouch);
-    return () => window.removeEventListener("touchstart", handleTouch);
-  }, [handleMobileDirection]);
 
   return (
     <div className={styles.gameContainer}>
