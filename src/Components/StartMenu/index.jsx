@@ -36,6 +36,7 @@ const StartMenu = ({ onStart }) => {
         <button className={level === 1 ? styles.selected : ""} onClick={() => setLevel(1)}>Level 1</button>
         <button className={level === 2 ? styles.selected : ""} onClick={() => setLevel(2)}>Level 2</button>
         <button className={level === 3 ? styles.selected : ""} onClick={() => setLevel(3)}>Level 3</button>
+        <button className={level === 4 ? styles.selected : ""} onClick={() => setLevel(4)}>Level 4</button>
         {/* // Add more levels */}
       </div>
 

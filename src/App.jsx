@@ -3,6 +3,7 @@ import StartMenu from "./Components/StartMenu/index";
 import Board1 from "./Components/levels/Board1";
 import Board2 from "./Components/levels/Board2";
 import Board3 from "./Components/levels/Board3";
+import Board4 from "./Components/levels/Board4";
 import "./App.css";
 
 const App = () => {
@@ -31,6 +32,9 @@ const App = () => {
           onGameOver={() => setGameStarted(false)}/>
         ) : level === 3 ? (
           <Board3 difficulty={difficulty} 
+          onGameOver={() => setGameStarted(false)}/>
+        ) : level === 4 ? (
+          <Board4 difficulty={difficulty} 
           onGameOver={() => setGameStarted(false)}/>
         ) : (
           <div>Invalid level selected</div>

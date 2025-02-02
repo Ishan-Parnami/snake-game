@@ -4,7 +4,7 @@ import BaseGame from '../BaseGame/index';
 const Board3 = ({ difficulty, onGameOver }) => {
   return (
     <BaseGame
-      level={1}
+      level={3}
       difficulty={difficulty}
       onGameOver={onGameOver}
       wallCollision={true}
