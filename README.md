@@ -6,7 +6,7 @@
 A modern implementation of the classic Snake game with React, Vite, and Tailwind CSS, featuring difficulty levels and pause functionality.  
 
 ![Game Screenshot](./public/screenshot.png)  
-![Game Screenshot](./public/screenshot1.png)  
+![Game Screenshot](./public/Screenshot1.png)  
 
 ---
 
