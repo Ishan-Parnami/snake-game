@@ -53,25 +53,6 @@ $button-hover: #3e8e41;
   }
 }
 
-// Snake Head Glow Animation
-@keyframes snakeHeadGlow {
-  0% { filter: drop-shadow(0 0 5px rgba(69, 160, 73, 0.8)); }
-  50% { filter: drop-shadow(0 0 10px rgba(69, 160, 73, 1)); }
-  100% { filter: drop-shadow(0 0 5px rgba(69, 160, 73, 0.8)); }
-}
-
-.canvasContainer {
-  canvas {
-    &.snakeHeadGlow {
-      animation: snakeHeadGlow 1.5s infinite;
-    }
-  }
-}
-
-.snake-segment {
-  transition: transform 0.15s ease-out;
-}
-
 // -------------------------------------------- //
 
 .mobileControls {

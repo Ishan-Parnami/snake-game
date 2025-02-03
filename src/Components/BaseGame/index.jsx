@@ -46,16 +46,6 @@ useEffect(() => {
   }
 }, [score]);
 
-const [headGlow, setHeadGlow] = useState(false);
-
-useEffect(() => {
-  if (snake.length > 1) {
-    setHeadGlow(true);
-  } else {
-    setHeadGlow(false);
-  }
-}, [snake.length]);
-
   useEffect(() => {
     const calculateDimensions = () => {
       const screenWidth = window.innerWidth;
@@ -319,7 +309,6 @@ useEffect(() => {
     width={canvasSize} 
     height={canvasSize} 
     style={{ border: borderStyle }}
-    className={headGlow ? styles.snakeHeadGlow : ''}
   ></canvas>
 </div>
 
