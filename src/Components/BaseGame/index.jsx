@@ -11,11 +11,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   const baseGridSize = 20;
   const baseCanvasSize = 500;
 
-  const [borderStyle, setBorderStyle] = useState("none");
-
-  useEffect(() => {
-    setBorderStyle(wallCollision ? "2px solid #4CAF50" : "none");
-  }, [wallCollision]);
+  const borderStyle = wallCollision ? "2px solid #4CAF50" : "none";
 
   // Responsive state
   const [canvasSize, setCanvasSize] = useState(baseCanvasSize);
@@ -41,27 +37,6 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     setDirection(newDirection);
   }, [isPaused]);
 
-  useEffect(() => {
-    const handleTouch = (e) => {
-      switch (e.target.id) {
-        case "up":
-          handleMobileDirection("up");
-          break;
-        case "down":
-          handleMobileDirection("down");
-          break;
-        case "left":
-          handleMobileDirection("left");
-          break;
-        case "right":
-          handleMobileDirection("right");
-          break;
-        default: return;
-      }
-    };
-    window.addEventListener("touchstart", handleTouch);
-    return () => window.removeEventListener("touchstart", handleTouch);
-  }, [handleMobileDirection]);
 
   // Responsive dimensions calculation
   useEffect(() => {
@@ -89,7 +64,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     calculateDimensions();
     window.addEventListener('resize', calculateDimensions);
     return () => window.removeEventListener('resize', calculateDimensions);
-  }, [handleMobileDirection]);
+  }, []);
 
   // Game speed calculation
   const gameSpeed = useMemo(() => {
@@ -289,12 +264,10 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   // Game loop
   useEffect(() => {
     if (!isPaused && !gameOver) {
-      const gameSpeed = difficulty === "easy" ? 175 :
-        difficulty === "medium" ? 150 : 125;
       const interval = setInterval(moveSnake, gameSpeed);
       return () => clearInterval(interval);
     }
-  }, [isPaused, moveSnake, gameOver, difficulty]);
+  }, [isPaused, moveSnake, gameOver, gameSpeed]);
 
   return (
     <div className={styles.gameContainer}>
@@ -306,9 +279,6 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
       <div className={styles.canvasContainer}>
         <canvas id="gameCanvas" width={canvasSize} height={canvasSize} style={{ border: borderStyle }}></canvas>
       </div>
-      <button className={styles.startBtn} onClick={() => setIsPaused(!isPaused)}>
-        {isPaused ? "Play" : "Pause"}
-      </button>
 
       <div className={styles.mobileControls}>
         <button className={styles.controlButton} onClick={() => handleMobileDirection("up")}>▲</button>
@@ -319,10 +289,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
         <button className={styles.controlButton} onClick={() => handleMobileDirection("down")}>▼</button>
       </div>
 
-      <button
-        className={styles.mobilePauseButton}
-        onClick={() => setIsPaused(!isPaused)}
-      >
+      <button className={styles.mobilePauseButton} onClick={() => setIsPaused(!isPaused)}>
         {isPaused ? "Play" : "Pause"}
       </button>
     </div>

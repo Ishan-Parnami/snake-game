@@ -18,28 +18,19 @@ const App = () => {
     setGameStarted(true);
   };
 
+  const boards = [Board1, Board2, Board3, Board4, Board5];
+  const CurrentBoard = boards[level - 1];
+
   return (
     <div className="app-container">
       {!gameStarted ? (
         <StartMenu onStart={handleStart} />
       ) : (
-        level === 1 ? (
-          <Board1 
+        CurrentBoard ? (
+          <CurrentBoard 
             difficulty={difficulty} 
             onGameOver={() => setGameStarted(false)}
           />
-        ) : level === 2 ? (
-          <Board2 difficulty={difficulty} 
-          onGameOver={() => setGameStarted(false)}/>
-        ) : level === 3 ? (
-          <Board3 difficulty={difficulty} 
-          onGameOver={() => setGameStarted(false)}/>
-        ) : level === 4 ? (
-          <Board4 difficulty={difficulty} 
-          onGameOver={() => setGameStarted(false)}/>
-        ) : level === 5 ? (
-          <Board5 difficulty={difficulty} 
-          onGameOver={() => setGameStarted(false)}/>
         ) : (
           <div>Invalid level selected</div>
         )
