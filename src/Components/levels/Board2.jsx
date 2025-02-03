@@ -1,6 +1,5 @@
-import PropTypes from 'prop-types';
+import { BoardxPropTypes } from '../../utils/propTypes';
 import BaseGame from '../BaseGame/index';
-// import styles from './Board2.module.scss'; 
 
 const Board2 = ({ difficulty, onGameOver }) => {
   // Define obstacles for Level 2
@@ -20,9 +19,6 @@ const Board2 = ({ difficulty, onGameOver }) => {
   );
 };
 
-Board2.propTypes = {
-  difficulty: PropTypes.string.isRequired,
-  onGameOver: PropTypes.func.isRequired,
-};
+Board2.propTypes = BoardxPropTypes;
 
 export default Board2;

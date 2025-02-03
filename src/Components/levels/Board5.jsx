@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import { BoardxPropTypes } from '../../utils/propTypes';
 import BaseGame from '../BaseGame/index';
 
 const Board5 = ({ difficulty, onGameOver }) => {
@@ -18,9 +18,6 @@ const Board5 = ({ difficulty, onGameOver }) => {
   );
 };
 
-Board5.propTypes = {
-  difficulty: PropTypes.string.isRequired,
-  onGameOver: PropTypes.func.isRequired,
-};
+Board5.propTypes = BoardxPropTypes;
 
 export default Board5;

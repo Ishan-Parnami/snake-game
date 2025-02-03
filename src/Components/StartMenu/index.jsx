@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
+import { StartMenuPropTypes } from "../../utils/propTypes";
 import styles from "./styles.module.scss";
 
 const StartMenu = ({ onStart }) => {
@@ -73,8 +73,6 @@ const StartMenu = ({ onStart }) => {
   );
 };
 
-StartMenu.propTypes = {
-  onStart: PropTypes.func.isRequired,
-};
+StartMenu.propTypes = StartMenuPropTypes;
 
 export default StartMenu;

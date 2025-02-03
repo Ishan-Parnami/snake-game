@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
-import PropTypes from "prop-types";
+import { BaseGamePropTypes } from "../../utils/propTypes";
 import styles from "./styles.module.scss";
 
 const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision = false }) => {
@@ -296,17 +296,6 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   );
 };
 
-BaseGame.propTypes = {
-  level: PropTypes.number.isRequired,
-  difficulty: PropTypes.string.isRequired,
-  onGameOver: PropTypes.func.isRequired,
-  wallCollision: PropTypes.bool,
-  obstacles: PropTypes.arrayOf(
-    PropTypes.shape({
-      x: PropTypes.number.isRequired,
-      y: PropTypes.number.isRequired
-    })
-  )
-};
+BaseGame.propTypes = BaseGamePropTypes;
 
 export default BaseGame;
