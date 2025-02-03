@@ -32,9 +32,44 @@ $button-hover: #3e8e41;
 .canvasContainer {
   position: relative;
   canvas {
-    // border: 2px solid $border-color;
+    transition: transform 0.1s ease-in-out;
     background-color: #000;
   }
+}
+
+// Score animations
+@keyframes scorePop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.currentScore {
+  transition: all 0.3s ease;
+  
+  &.updated {
+    animation: scorePop 0.3s ease-out;
+    color: #4CAF50;
+  }
+}
+
+// Snake Head Glow Animation
+@keyframes snakeHeadGlow {
+  0% { filter: drop-shadow(0 0 5px rgba(69, 160, 73, 0.8)); }
+  50% { filter: drop-shadow(0 0 10px rgba(69, 160, 73, 1)); }
+  100% { filter: drop-shadow(0 0 5px rgba(69, 160, 73, 0.8)); }
+}
+
+.canvasContainer {
+  canvas {
+    &.snakeHeadGlow {
+      animation: snakeHeadGlow 1.5s infinite;
+    }
+  }
+}
+
+.snake-segment {
+  transition: transform 0.15s ease-out;
 }
 
 // -------------------------------------------- //

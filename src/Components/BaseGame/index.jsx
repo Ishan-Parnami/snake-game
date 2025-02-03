@@ -36,22 +36,33 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
     if (isPaused) setIsPaused(false);
     setDirection(newDirection);
   }, [isPaused]);
+const [scoreUpdated, setScoreUpdated] = useState(false);
 
+useEffect(() => {
+  if (score > 0) {
+    setScoreUpdated(true);
+    const timer = setTimeout(() => setScoreUpdated(false), 300);
+    return () => clearTimeout(timer);
+  }
+}, [score]);
 
-  // Responsive dimensions calculation
+const [headGlow, setHeadGlow] = useState(false);
+
+useEffect(() => {
+  if (snake.length > 1) {
+    setHeadGlow(true);
+  } else {
+    setHeadGlow(false);
+  }
+}, [snake.length]);
+
   useEffect(() => {
     const calculateDimensions = () => {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-
-      // Calculate maximum canvas size
       const maxSize = Math.min(screenWidth * 0.9, screenHeight * 0.7, baseCanvasSize);
       const scaleFactor = maxSize / baseCanvasSize;
-
-      // Calculate proportional grid size (minimum 10px)      
       const newGridSize = Math.max(Math.floor(baseGridSize * scaleFactor), 10);
-
-      // Adjust canvas size to fit exact grid cells      
       const exactTileCount = Math.floor(maxSize / newGridSize);
       const adjustedCanvasSize = exactTileCount * newGridSize;
 
@@ -176,44 +187,62 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   }, [direction, food.x, food.y, generateFood, wallCollision, handleGameOver, tileCountX, tileCountY, obstacles]);
 
   // Drawing logic
-  useEffect(() => {
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+useEffect(() => {
+  const canvas = document.getElementById("gameCanvas");
+  const ctx = canvas.getContext("2d");
+  let animationFrameId;
 
+  const draw = () => {
+    ctx.clearRect(0, 0, canvasSize, canvasSize);
+    
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvasSize, canvasSize);
 
-    if (obstacles) {
-      ctx.fillStyle = "#555"; // Gray color for obstacles
-      obstacles.forEach((obstacle) => {
-        ctx.fillRect(
-          obstacle.x * gridSize + 1,
-          obstacle.y * gridSize + 1,
-          gridSize - 2,
-          gridSize - 2
-        );
-      });
-    }
+    ctx.fillStyle = "#555";
+    obstacles.forEach(({x, y}) => {
+      ctx.beginPath();
+      ctx.roundRect(
+        x * gridSize + 1,
+        y * gridSize + 1,
+        gridSize - 2,
+        gridSize - 2,
+        [4]
+      );
+      ctx.fill();
+    });
 
     snake.forEach((segment, index) => {
       ctx.fillStyle = index === 0 ? "#45a049" : "#4caf50";
-      ctx.fillRect(
+      ctx.beginPath();
+      ctx.roundRect(
         segment.x * gridSize,
         segment.y * gridSize,
         gridSize - 2,
-        gridSize - 2
+        gridSize - 2,
+        [5]
       );
+      ctx.fill();
     });
 
+    // Draw animated food
+    const pulse = Math.sin(Date.now() * 0.005) * 0.2 + 1;
     ctx.fillStyle = "#ff0000";
-    ctx.fillRect(
-      food.x * gridSize,
-      food.y * gridSize,
-      gridSize - 2,
-      gridSize - 2
+    ctx.beginPath();
+    ctx.arc(
+      food.x * gridSize + gridSize/2,
+      food.y * gridSize + gridSize/2,
+      (gridSize/2 - 2) * pulse,
+      0,
+      Math.PI * 2
     );
-  }, [snake, food, gridSize, canvasSize, obstacles]);
+    ctx.fill();
 
+    animationFrameId = requestAnimationFrame(draw);
+  };
+
+  draw();
+  return () => cancelAnimationFrame(animationFrameId);
+}, [snake, food, gridSize, canvasSize, obstacles]);
   // Keyboard controls
   useEffect(() => {
     const handleKeyPress = (e) => {
@@ -258,27 +287,41 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   }, [direction]);
 
   useEffect(() => {
-    gameOverRef.current = false; // Reset when the game starts
+    gameOverRef.current = false;
   }, [level, difficulty]);
 
-  // Game loop
-  useEffect(() => {
+useEffect(() => {
+  let gameInterval;
+  const gameLoop = () => {
     if (!isPaused && !gameOver) {
-      const interval = setInterval(moveSnake, gameSpeed);
-      return () => clearInterval(interval);
+      moveSnake();
     }
-  }, [isPaused, moveSnake, gameOver, gameSpeed]);
+  };
+
+  if (!isPaused && !gameOver) {
+    gameInterval = setInterval(gameLoop, gameSpeed);
+  }
+  return () => clearInterval(gameInterval);
+}, [isPaused, gameOver, moveSnake, gameSpeed]);
 
   return (
     <div className={styles.gameContainer}>
       <div className={styles.scoreContainer}>
-        <div className={styles.highScore}>Highest Score: {highScore}</div>
-        <div className={styles.currentScore}>Your Score: {score}</div>
-      </div>
+  <div className={styles.highScore}>Highest Score: {highScore}</div>
+  <div className={`${styles.currentScore} ${scoreUpdated ? styles.updated : ''}`}>
+    Your Score: {score}
+  </div>
+</div>
 
-      <div className={styles.canvasContainer}>
-        <canvas id="gameCanvas" width={canvasSize} height={canvasSize} style={{ border: borderStyle }}></canvas>
-      </div>
+<div className={styles.canvasContainer}>
+  <canvas 
+    id="gameCanvas" 
+    width={canvasSize} 
+    height={canvasSize} 
+    style={{ border: borderStyle }}
+    className={headGlow ? styles.snakeHeadGlow : ''}
+  ></canvas>
+</div>
 
       <div className={styles.mobileControls}>
         <button className={styles.controlButton} onClick={() => handleMobileDirection("up")}>▲</button>
