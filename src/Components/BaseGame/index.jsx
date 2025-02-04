@@ -28,6 +28,10 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   const directionRef = useRef(direction);
   const gameOverRef = useRef(false);
 
+  const updateScore =(score) => {
+    setScore(score + 1);
+  }
+
   const gameSpeed = useMemo(() => {
     return difficulty === "easy" ? 175 : difficulty === "medium" ? 150 : 125;
   }, [difficulty]);
@@ -113,11 +117,11 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
         handleGameOver();
         return prevSnake;
       }
-
+      
       const newSnake = [head, ...prevSnake];
 
       if (head.x === food.x && head.y === food.y) {
-        setScore((s) => s + 1);
+        updateScore(score)
         setFood(generateFood());
       } else {
         newSnake.pop();
@@ -125,7 +129,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
 
       return newSnake;
     });
-  }, [food.x, food.y, generateFood, wallCollision, handleGameOver, tileCountX, tileCountY, obstacles]);
+  }, [food.x, food.y, generateFood, wallCollision, handleGameOver, tileCountX, tileCountY, obstacles, score]);
 
   useEffect(() => {
     if (score > 0) {
