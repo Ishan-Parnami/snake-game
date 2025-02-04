@@ -168,7 +168,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
   useEffect(() => {
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
-    let animationFrameId;
+    let animationFrameId; 
 
     const draw = () => {
       ctx.clearRect(0, 0, canvasSize, canvasSize);
