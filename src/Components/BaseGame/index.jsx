@@ -137,7 +137,7 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
       const timer = setTimeout(() => setScoreUpdated(false), 300);
       return () => clearTimeout(timer);
     }
-  }, [score]);
+  }, [score]); 
 
   useEffect(() => {
     const calculateDimensions = () => {
