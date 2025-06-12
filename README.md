@@ -4,7 +4,8 @@
 [![Vite](https://img.shields.io/badge/Vite-4.4.0-orange)](https://vitejs.dev/)  
 
 A modern implementation of the classic Snake game with React, Vite, and Tailwind CSS, featuring difficulty levels and pause functionality.  
-Play the game here 👉 <a target="_blank" href="https://snake-game-oexj.onrender.com/">Snake Game</a> 🎮
+<a href="https://snake-game-oexj.onrender.com/" target="_blank">Play the game here </a>🎮
+
 
 ![Game Screenshot](./public/screenshot.png)  
 ![Game Screenshot](./public/Screenshot1.png)  
