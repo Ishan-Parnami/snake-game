@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { BaseGamePropTypes } from "../../utils/propTypes";
+import { generateFoodlogic, GameOverMsg } from "./helpers/GameLogic";
 import styles from "./styles.module.scss";
 
 const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision = false }) => {
@@ -47,40 +48,18 @@ const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision
       setHighScore(newScore);
     }
   }, [highScore, level, difficulty]);
-
-  const generateFood = useCallback(() => {
-    const newFood = {
-      x: Math.floor(Math.random() * tileCountX),
-      y: Math.floor(Math.random() * tileCountY)
-    };
-
-    while (
-      snake.some(segment => segment.x === newFood.x && segment.y === newFood.y) ||
-      obstacles.some(obstacle => obstacle.x === newFood.x && obstacle.y === newFood.y)
-    ) {
-      newFood.x = Math.floor(Math.random() * tileCountX);
-      newFood.y = Math.floor(Math.random() * tileCountY);
-    }
-
-    return newFood;
-  }, [snake, tileCountX, tileCountY, obstacles]);
+  
+  const generateFood = useCallback(
+    () => generateFoodlogic(tileCountX, tileCountY, snake, obstacles),
+    [tileCountX, tileCountY, snake, obstacles]
+  );
 
   const handleGameOver = useCallback(() => {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
-
     setGameOver(true);
     saveHighScore(score);
-
-    let message;
-    if (score > highScore) {
-      message = `New High Score! 🎉\n Your Score: ${score}\nPrevious Best: ${highScore}`;
-    } else {
-      message = `Game Over! Your Score: ${score}\nHighest Score: ${highScore}`;
-    }
-
-    alert(message);
-    onGameOver();
+    GameOverMsg(score, highScore, onGameOver);    
   }, [score, highScore, onGameOver, saveHighScore]);
 
   const moveSnake = useCallback(() => {
