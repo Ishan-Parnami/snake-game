@@ -5,6 +5,7 @@ import Board2 from "./Components/levels/Board2";
 import Board3 from "./Components/levels/Board3";
 import Board4 from "./Components/levels/Board4";
 import Board5 from "./Components/levels/Board5";
+import Board6 from "./Components/levels/Board6";
 import "./App.css";
 
 const App = () => {
@@ -18,7 +19,7 @@ const App = () => {
     setGameStarted(true);
   };
 
-  const boards = [Board1, Board2, Board3, Board4, Board5];
+  const boards = [Board1, Board2, Board3, Board4, Board5, Board6];
   const CurrentBoard = boards[level - 1];
 
   return (
