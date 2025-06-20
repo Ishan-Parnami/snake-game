@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { BaseGamePropTypes } from "../../utils/propTypes";
-import { generateFoodlogic, GameOverMsg } from "./helpers/GameLogic";
+import { generateFoodlogic, GameOverMsg } from "./helpers/gameLogic";
 import styles from "./styles.module.scss";
 
 const BaseGame = ({ level, difficulty, onGameOver, obstacles = [], wallCollision = false }) => {
